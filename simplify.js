@@ -4,35 +4,33 @@
  mourner.github.io/simplify-js
 */
 
-(function () { 'use strict';
-
-// to suit your point format, run search/replace for '.x' and '.y';
+// to suit your point format, run search/replace for '.latitude' and '.longitude';
 // for 3D version, see 3d branch (configurability would draw significant performance overhead)
 
 // square distance between 2 points
-function getSqDist(p1, p2) {
+const getSqDist = (p1, p2) => {
 
-    var dx = p1.x - p2.x,
-        dy = p1.y - p2.y;
+    var dx = p1.latitude - p2.latitude,
+        dy = p1.longitude - p2.longitude;
 
     return dx * dx + dy * dy;
 }
 
 // square distance from a point to a segment
-function getSqSegDist(p, p1, p2) {
+const getSqSegDist = (p, p1, p2) => {
 
-    var x = p1.x,
-        y = p1.y,
-        dx = p2.x - x,
-        dy = p2.y - y;
+    var x = p1.latitude,
+        y = p1.longitude,
+        dx = p2.latitude - x,
+        dy = p2.longitude - y;
 
     if (dx !== 0 || dy !== 0) {
 
-        var t = ((p.x - x) * dx + (p.y - y) * dy) / (dx * dx + dy * dy);
+        var t = ((p.latitude - x) * dx + (p.longitude - y) * dy) / (dx * dx + dy * dy);
 
         if (t > 1) {
-            x = p2.x;
-            y = p2.y;
+            x = p2.latitude;
+            y = p2.longitude;
 
         } else if (t > 0) {
             x += dx * t;
@@ -40,15 +38,15 @@ function getSqSegDist(p, p1, p2) {
         }
     }
 
-    dx = p.x - x;
-    dy = p.y - y;
+    dx = p.latitude - x;
+    dy = p.longitude - y;
 
     return dx * dx + dy * dy;
 }
 // rest of the code doesn't care about point format
 
 // basic distance-based simplification
-function simplifyRadialDist(points, sqTolerance) {
+const simplifyRadialDist = (points, sqTolerance) => {
 
     var prevPoint = points[0],
         newPoints = [prevPoint],
@@ -68,7 +66,7 @@ function simplifyRadialDist(points, sqTolerance) {
     return newPoints;
 }
 
-function simplifyDPStep(points, first, last, sqTolerance, simplified) {
+const simplifyDPStep = (points, first, last, sqTolerance, simplified) => {
     var maxSqDist = sqTolerance,
         index;
 
@@ -89,7 +87,7 @@ function simplifyDPStep(points, first, last, sqTolerance, simplified) {
 }
 
 // simplification using Ramer-Douglas-Peucker algorithm
-function simplifyDouglasPeucker(points, sqTolerance) {
+const simplifyDouglasPeucker = (points, sqTolerance) => {
     var last = points.length - 1;
 
     var simplified = [points[0]];
@@ -100,7 +98,7 @@ function simplifyDouglasPeucker(points, sqTolerance) {
 }
 
 // both algorithms combined for awesome performance
-function simplify(points, tolerance, highestQuality) {
+export default simplify = (points, tolerance, highestQuality) => {
 
     if (points.length <= 2) return points;
 
@@ -111,13 +109,3 @@ function simplify(points, tolerance, highestQuality) {
 
     return points;
 }
-
-// export as AMD module / Node module / browser or worker variable
-if (typeof define === 'function' && define.amd) define(function() { return simplify; });
-else if (typeof module !== 'undefined') {
-    module.exports = simplify;
-    module.exports.default = simplify;
-} else if (typeof self !== 'undefined') self.simplify = simplify;
-else window.simplify = simplify;
-
-})();
